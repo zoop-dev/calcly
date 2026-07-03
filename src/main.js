@@ -449,11 +449,12 @@ function clearAll() {
   expr = ''
   expressionLabel = ''
   justEvaluated = false
-  if (fractionState || formulaState) {
-    fractionState = null
-    formulaState = null
-    retriggerFitCalcGrid()
-  }
+  fractionState = null
+  formulaState = null
+  
+  
+  
+  retriggerFitCalcGrid()
 }
 
 function clearOrBackspace() {

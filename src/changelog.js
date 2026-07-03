@@ -1,6 +1,11 @@
-export const APP_VERSION = '0.2.0'
+export const APP_VERSION = '0.2.1'
 
 export const CHANGELOG = [
+  {
+    version: '0.2.1',
+    date: '2026-07-03',
+    items: ['fixed the numpad not resizing back after AC while the scientific/algebra panel was open'],
+  },
   {
     version: '0.2.0',
     date: '2026-07-03',
