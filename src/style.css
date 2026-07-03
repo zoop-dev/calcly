@@ -1,0 +1,482 @@
+@import "zoop-kit/tokens.css";
+@import "zoop-kit/components.css";
+
+:root {
+  --accent: #2be675;
+  --accent-on: #05170d;
+  --grad: #06170f 0%, #0d3324 55%, #1ed760 100%;
+}
+
+
+#app {
+  padding-bottom: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.topbar-actions {
+  display: flex;
+  gap: 4px;
+}
+
+.topbar-icon-btn {
+  all: unset;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  color: var(--muted);
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, transform 0.1s ease;
+}
+
+.topbar-icon-btn:active {
+  background: var(--glass);
+  color: var(--text);
+  transform: scale(0.9);
+}
+
+
+.history-panel {
+  display: flex;
+  gap: 10px;
+  overflow-x: auto;
+  padding: 4px 18px 18px;
+  scrollbar-width: none;
+}
+
+.history-panel::-webkit-scrollbar {
+  display: none;
+}
+
+.history-empty {
+  color: var(--muted);
+  font-size: 0.82rem;
+  margin: 0;
+  padding: 10px 4px;
+}
+
+.history-item {
+  all: unset;
+  box-sizing: border-box;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  background: var(--glass);
+  border: 1px solid var(--glass-border);
+  border-radius: 14px;
+  padding: 10px 16px;
+  cursor: pointer;
+  min-width: 96px;
+  transition: transform 0.15s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.15s ease;
+}
+
+.history-item:active {
+  transform: scale(0.94);
+  background: var(--glass-strong);
+}
+
+.history-expr {
+  font-size: 0.72rem;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.history-result {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.95rem;
+  white-space: nowrap;
+}
+
+
+
+.sci-toggle-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  padding: 0 20px;
+  margin-top: 18px;
+  margin-bottom: 6px;
+}
+
+.sci-toggle-mini {
+  all: unset;
+  box-sizing: border-box;
+  grid-column: 1;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  background: var(--accent);
+  color: var(--accent-on);
+  cursor: pointer;
+  transition: transform 0.1s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.sci-toggle-mini:active {
+  transform: scale(0.92);
+}
+
+.sci-toggle-chevron {
+  font-size: 16px;
+  --md-icon-size: 16px;
+}
+
+.sci-tab-btn {
+  all: unset;
+  box-sizing: border-box;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  height: 30px;
+  border-radius: 999px;
+  background: var(--glass);
+  color: var(--muted);
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 0.78rem;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.sci-tab-btn:nth-of-type(2) {
+  grid-column: 2;
+}
+
+.sci-tab-btn:nth-of-type(3) {
+  grid-column: 3;
+}
+
+.sci-toggle-row.open .sci-tab-btn {
+  display: flex;
+}
+
+.sci-tab-btn.active {
+  background: var(--accent);
+  color: var(--accent-on);
+}
+
+.sci-row-wrap {
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.25s ease;
+}
+
+.sci-row-wrap.open {
+  max-height: 140px;
+}
+
+.sci-row {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-template-rows: repeat(3, auto);
+  gap: 6px;
+  padding: 6px 18px 12px;
+}
+
+
+.sci-row[hidden],
+.algebra-row[hidden] {
+  display: none;
+}
+
+
+.algebra-row {
+  display: flex;
+  gap: 6px;
+  padding: 6px 18px 12px;
+}
+
+.algebra-grid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  grid-template-rows: repeat(2, auto);
+  gap: 6px;
+}
+
+.sci-btn {
+  all: unset;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 32px;
+  padding: 0 4px;
+  border-radius: 999px;
+  background: var(--glass);
+  color: var(--text);
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.1s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.15s ease, color 0.15s ease;
+}
+
+
+.fraction-square-btn {
+  flex-shrink: 0;
+  width: 25%;
+  height: auto;
+  font-size: 0.78rem;
+  border-radius: 20px;
+}
+
+.sci-btn:active {
+  transform: scale(0.9);
+}
+
+.sci-btn.active {
+  background: var(--accent);
+  color: var(--accent-on);
+}
+
+
+.calc-display-wrap {
+  padding: 36px 24px 20px;
+  text-align: right;
+  min-height: 70px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  transition: padding 0.2s ease;
+}
+
+.calc-grid {
+  flex-shrink: 0;
+}
+
+.calc-expression {
+  margin: 0 0 6px;
+  font-size: 1.3rem;
+  color: var(--muted);
+  min-height: 1.4em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.calc-display {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 4.6rem;
+  line-height: 1;
+  letter-spacing: -0.01em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: clip;
+}
+
+
+.calc-display.has-fraction {
+  overflow: visible;
+  line-height: 1.6;
+  padding-top: 0.3em;
+}
+
+.calc-preview {
+  margin: 6px 0 0;
+  font-size: 1.25rem;
+  color: var(--muted);
+  min-height: 1.3em;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: color 0.15s ease;
+}
+
+
+.calc-preview.shrink-1 {
+  font-size: 1rem;
+}
+
+.calc-preview.shrink-2 {
+  font-size: 0.82rem;
+}
+
+.calc-preview.error {
+  color: #ff5555;
+  font-weight: 700;
+}
+
+
+.frac-inline {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  vertical-align: middle;
+  font-size: 0.45em;
+  line-height: 1.3;
+  margin: 0 6px;
+}
+
+.frac-num,
+.frac-den {
+  padding: 2px 8px;
+  min-width: 1.6em;
+  border-radius: 4px;
+  text-align: center;
+  background: var(--glass);
+  cursor: pointer;
+}
+
+.frac-num.active,
+.frac-den.active {
+  background: var(--glass-strong);
+  outline: 2px solid var(--accent);
+}
+
+.frac-bar {
+  width: 100%;
+  height: 2px;
+  background: currentColor;
+  margin: 2px 0;
+}
+
+.fraction-controls {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+
+.fraction-controls[hidden] {
+  display: none;
+}
+
+.fraction-controls button {
+  all: unset;
+  box-sizing: border-box;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: var(--glass-strong);
+  color: var(--text);
+  font-family: var(--font-body);
+  font-size: 0.78rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+#fraction-done {
+  background: var(--accent);
+  color: var(--accent-on);
+}
+
+@keyframes calc-error-flash {
+  0% {
+    color: var(--text);
+  }
+  15% {
+    color: #ff5555;
+  }
+  70% {
+    color: #ff5555;
+  }
+  100% {
+    color: var(--text);
+  }
+}
+
+.calc-display.flash-error {
+  animation: calc-error-flash 1.3s ease;
+}
+
+
+.calc-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  padding: 12px 20px max(24px, env(safe-area-inset-bottom));
+}
+
+.calc-btn {
+  all: unset;
+  box-sizing: border-box;
+  height: var(--calc-btn-height, 100px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 26px;
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  font-weight: 600;
+  cursor: pointer;
+  user-select: none;
+  
+  transition: transform 0.1s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.1s ease, background 0.15s ease, color 0.15s ease;
+}
+
+.calc-btn:active {
+  transform: scale(0.9);
+  filter: brightness(1.15);
+}
+
+.calc-btn-num {
+  background: var(--glass);
+  color: var(--text);
+}
+
+.calc-btn-fn {
+  background: var(--glass-strong);
+  color: var(--text);
+  font-size: 1.3rem;
+}
+
+.calc-btn-fn md-icon {
+  font-size: 24px;
+  --md-icon-size: 24px;
+}
+
+.calc-btn-op {
+  background: var(--accent);
+  color: var(--accent-on);
+}
+
+.calc-btn-op.active {
+  background: var(--text);
+  color: var(--accent);
+}
+
+.calc-btn-zero {
+  grid-column: span 2;
+  justify-content: flex-start;
+  padding-left: 34px;
+}
+
+.calc-btn-equals {
+  font-size: 1.8rem;
+}
+
+
+.full-history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.full-history-list .history-item {
+  min-width: 0;
+  width: 100%;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 6px;
+  padding: 18px 18px;
+}
+
+.full-history-list .history-expr {
+  white-space: normal;
+  overflow-wrap: break-word;
+  line-height: 1.4;
+}
+
+.full-history-list .history-result {
+  font-size: 1.15rem;
+}
