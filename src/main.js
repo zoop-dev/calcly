@@ -15,8 +15,10 @@ import { attachBootLoader, removeBootLoaderImmediately } from 'zoop-kit/boot-loa
 import { initUpdateCheck } from 'zoop-kit/update-check.js'
 import { maybeShowChangelog } from 'zoop-kit/changelog.js'
 import { initDesktopWarning } from 'zoop-kit/desktop-warning.js'
-import { initSavedTheme } from 'zoop-kit/theme-picker.js'
+import { initSavedTheme, THEMES } from 'zoop-kit/theme-picker.js'
 import { initSettingsMenu } from 'zoop-kit/settings-menu.js'
+import { fitTextToWidth, fitRowsToViewport, retriggerFit } from 'zoop-kit/fit.js'
+import { showFilterableList } from 'zoop-kit/filter-list.js'
 import { pushOverlay, popOverlay } from 'zoop-kit/back-nav.js'
 import { evaluateExpression, evaluateExpressionWithReason, solveForX } from './engine.js'
 import { APP_VERSION, CHANGELOG } from './changelog.js'
@@ -152,14 +154,6 @@ const FORMULAS = [
 ]
 
 const FORMULA_CATEGORIES = ['All', ...new Set(FORMULAS.map((f) => f.category))]
-
-const THEMES = {
-  emerald: { accent: '#2be675', accentOn: '#05170d', grad: '#06170f 0%, #0d3324 55%, #1ed760 100%' },
-  ocean: { accent: '#4cc9ff', accentOn: '#04121c', grad: '#0a1330 0%, #123a63 55%, #1c6fd0 100%' },
-  sunset: { accent: '#ff6a6a', accentOn: '#2a0505', grad: '#1a0505 0%, #3a0f0f 55%, #c22e2e 100%' },
-  violet: { accent: '#b28dff', accentOn: '#1a1023', grad: '#150a2e 0%, #2c1359 55%, #6a2fd0 100%' },
-  amber: { accent: '#ffb84c', accentOn: '#231404', grad: '#1f1405 0%, #4a2d0a 55%, #d98a1c 100%' },
-}
 
 let currentThemeKey = initSavedTheme(THEME_KEY, THEMES, 'emerald')
 
@@ -587,24 +581,6 @@ function formulaTemplateHtml(state) {
 const DISPLAY_FONT_MAX = 73.6 
 const DISPLAY_FONT_MIN = 22
 
-
-
-
-
-
-function fitDisplayText(displayEl) {
-  const wrap = displayEl.parentElement
-  const style = getComputedStyle(wrap)
-  const availWidth = wrap.clientWidth - parseFloat(style.paddingLeft) - parseFloat(style.paddingRight)
-
-  let fontSize = DISPLAY_FONT_MAX
-  displayEl.style.fontSize = `${fontSize}px`
-  while (displayEl.scrollWidth > availWidth && fontSize > DISPLAY_FONT_MIN) {
-    fontSize -= 2
-    displayEl.style.fontSize = `${fontSize}px`
-  }
-}
-
 function render() {
   const displayEl = document.querySelector('#calc-display')
   const exprEl = document.querySelector('#calc-expression')
@@ -620,7 +596,7 @@ function render() {
     const shown = isSolveResult ? raw : justEvaluated ? formatDisplay(raw) : raw
     displayEl.textContent = shown
   }
-  fitDisplayText(displayEl)
+  fitTextToWidth(displayEl, { max: DISPLAY_FONT_MAX, min: DISPLAY_FONT_MIN })
   exprEl.textContent = expressionLabel
   document.querySelector('#fraction-controls').hidden = !fractionState && !formulaState
 
@@ -738,68 +714,19 @@ function showFullHistory() {
   requestAnimationFrame(() => el.classList.add('open'))
 }
 
-let formulaFilter = 'All'
-
 function showFormulasList() {
-  const el = document.createElement('div')
-  el.id = 'formulas-overlay'
-  el.className = 'search-overlay'
-  document.body.appendChild(el)
-
-  function renderList() {
-    const filtered = formulaFilter === 'All' ? FORMULAS : FORMULAS.filter((f) => f.category === formulaFilter)
-    el.querySelector('#formulas-list').innerHTML = filtered
-      .map(
-        (f) => `
-          <button type="button" class="formula-item" data-name="${escapeHtml(f.name)}">
-            <span class="formula-item-name">${f.name}</span>
-            <span class="formula-item-display">${f.display}</span>
-          </button>
-        `
-      )
-      .join('')
-
-    el.querySelectorAll('.formula-item').forEach((btn) => {
-      btn.addEventListener('click', () => {
-        const formula = FORMULAS.find((f) => f.name === btn.dataset.name)
-        startFormula(formula)
-        render()
-        popOverlay()
-      })
-    })
-  }
-
-  el.innerHTML = `
-    <div class="overlay-header">
-      <md-icon-button id="formulas-overlay-back" aria-label="Back"><md-icon>arrow_back</md-icon></md-icon-button>
-      <p class="overlay-title">Formulas</p>
-      <div class="overlay-spacer"></div>
-    </div>
-    <div class="formula-filter-row" id="formula-filter-row">
-      ${FORMULA_CATEGORIES.map((c) => `<button type="button" class="formula-filter-btn${c === formulaFilter ? ' active' : ''}" data-cat="${c}">${c}</button>`).join('')}
-    </div>
-    <div class="formula-list" id="formulas-list"></div>
-  `
-
-  el.querySelectorAll('.formula-filter-btn').forEach((btn) => {
-    btn.addEventListener('click', () => {
-      formulaFilter = btn.dataset.cat
-      el.querySelectorAll('.formula-filter-btn').forEach((b) => b.classList.toggle('active', b === btn))
-      renderList()
-    })
+  showFilterableList({
+    title: 'Formulas',
+    items: FORMULAS,
+    categories: FORMULA_CATEGORIES,
+    getCategory: (f) => f.category,
+    getKey: (f) => f.name,
+    renderItem: (f) => `<span class="formula-item-name">${f.name}</span><span class="formula-item-display">${f.display}</span>`,
+    onSelect: (formula) => {
+      startFormula(formula)
+      render()
+    },
   })
-
-  renderList()
-
-  el.querySelector('#formulas-overlay-back').addEventListener('click', popOverlay)
-
-  function closeFormulasOverlay() {
-    el.classList.remove('open')
-    setTimeout(() => el.remove(), 300)
-  }
-
-  pushOverlay(closeFormulasOverlay)
-  requestAnimationFrame(() => el.classList.add('open'))
 }
 
 function showHistoryStripCountPicker() {
@@ -858,36 +785,11 @@ const CALC_BTN_MIN = 44
 const CALC_GRID_ROWS = 5
 
 function fitCalcGrid() {
-  const root = document.documentElement
-
-  
-  
-  
-  
-  root.style.setProperty('--calc-btn-height', `${CALC_BTN_MAX}px`)
-  const overflow = document.documentElement.scrollHeight - window.innerHeight
-  if (overflow <= 0) return
-
-  const btnHeight = Math.max(CALC_BTN_MIN, CALC_BTN_MAX - overflow / CALC_GRID_ROWS)
-  root.style.setProperty('--calc-btn-height', `${btnHeight}px`)
+  fitRowsToViewport({ cssVar: '--calc-btn-height', rows: CALC_GRID_ROWS, max: CALC_BTN_MAX, min: CALC_BTN_MIN })
 }
 
-
-
-
-
-
-
 function retriggerFitCalcGrid() {
-  fitCalcGrid()
-  let frames = 0
-  const track = () => {
-    fitCalcGrid()
-    if (++frames < 30) requestAnimationFrame(track)
-  }
-  requestAnimationFrame(track)
-  setTimeout(fitCalcGrid, 320)
-  setTimeout(fitCalcGrid, 500)
+  retriggerFit(fitCalcGrid)
 }
 
 function renderApp() {
