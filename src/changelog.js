@@ -1,6 +1,14 @@
-export const APP_VERSION = '0.1.0'
+export const APP_VERSION = '0.2.0'
 
 export const CHANGELOG = [
+  {
+    version: '0.2.0',
+    date: '2026-07-03',
+    items: [
+      'formulas: a browsable library of ~50 formulas (geometry, algebra, finance, physics, and more), tap one to fill in the blanks and compute',
+      'filter the formula list by category',
+    ],
+  },
   {
     version: '0.1.0',
     date: '2026-07-03',
