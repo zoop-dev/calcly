@@ -238,7 +238,7 @@ function appendOperator(op) {
     return
   }
   const last = target.slice(-1)
-  const lastIsOperator = '+−×÷^'.includes(last)
+  const lastIsOperator = '+−×÷^⎷'.includes(last)
 
   if (op === '−' && (lastIsOperator || last === '(')) {
     setTarget(target + '−')
@@ -275,7 +275,7 @@ function appendParen() {
   const opens = (target.match(/\(/g) || []).length
   const closes = (target.match(/\)/g) || []).length
   const last = target.slice(-1)
-  if (opens > closes && last !== '(' && !'+−×÷^'.includes(last)) setTarget(target + ')')
+  if (opens > closes && last !== '(' && !'+−×÷^⎷'.includes(last)) setTarget(target + ')')
   else setTarget(target + '(')
 }
 
@@ -299,7 +299,7 @@ function appendPostfix(sym) {
   if (!fractionState && justEvaluated) justEvaluated = false
   const target = getTarget()
   const last = target.slice(-1)
-  if (!last || '+−×÷^('.includes(last)) return
+  if (!last || '+−×÷^⎷('.includes(last)) return
   setTarget(target + sym)
 }
 
@@ -811,6 +811,7 @@ function renderApp() {
         <button type="button" class="sci-btn" data-action="abs">|x|</button>
         <button type="button" class="sci-btn" data-action="op" data-op="mod">mod</button>
         <button type="button" class="sci-btn" data-action="ee">EE</button>
+        <button type="button" class="sci-btn" data-action="op" data-op="⎷">ⁿ√</button>
       </div>
       <div class="algebra-row" id="sci-row-algebra" hidden>
         <div class="algebra-grid">

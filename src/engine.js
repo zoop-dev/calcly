@@ -1,11 +1,4 @@
 
-
-
-
-
-
-
-
 const FUNC_ALIASES = {
   'sin⁻¹': 'asin',
   'cos⁻¹': 'acos',
@@ -74,7 +67,7 @@ function tokenize(src) {
       i++
       continue
     }
-    if ('+−×÷^'.includes(c)) {
+    if ('+−×÷^⎷'.includes(c)) {
       tokens.push({ type: 'op', value: c })
       i++
       continue
@@ -89,7 +82,6 @@ function tokenize(src) {
       i++
       continue
     }
-    
     i++
   }
   return tokens
@@ -165,12 +157,6 @@ class Parser {
     return value
   }
 
-  
-  
-  
-  
-  
-  
   startsImplicitFactor(tok) {
     return tok && ['num', 'func', 'lparen', 'var'].includes(tok.type)
   }
@@ -204,6 +190,18 @@ class Parser {
       this.next()
       const exp = this.parsePower() 
       return Math.pow(base, exp)
+    }
+    if (this.peek() && this.peek().type === 'op' && this.peek().value === '⎷') {
+      this.next()
+      const x = this.parsePower() 
+      if (base === 0) throw new CalcError("Can't take a 0th root")
+      if (x < 0) {
+        if (!Number.isInteger(base) || base % 2 === 0) {
+          throw new CalcError('Root of a negative number needs an odd whole-number index')
+        }
+        return -Math.pow(-x, 1 / base)
+      }
+      return Math.pow(x, 1 / base)
     }
     return base
   }
@@ -277,7 +275,6 @@ function evalCore(expr, angleMode, variables) {
   return result
 }
 
-
 export function evaluateExpression(expr, angleMode, variables) {
   if (!expr || !expr.trim()) return NaN
   try {
@@ -286,7 +283,6 @@ export function evaluateExpression(expr, angleMode, variables) {
     return NaN
   }
 }
-
 
 export function evaluateExpressionWithReason(expr, angleMode, variables) {
   if (!expr || !expr.trim()) return { value: NaN, error: 'Invalid expression' }
@@ -298,7 +294,6 @@ export function evaluateExpressionWithReason(expr, angleMode, variables) {
 }
 
 const INEQUALITY_OPS = ['≤', '≥', '<', '>']
-
 
 export function solveForX(expr, angleMode) {
   const op = INEQUALITY_OPS.find((o) => expr.includes(o)) || (expr.includes('=') ? '=' : null)
@@ -331,8 +326,6 @@ export function solveForX(expr, angleMode) {
     const root = -f0 / slope
     if (op === '=') return { result: `x = ${formatSolved(root)}`, error: null }
 
-    
-    
     const wantsPositive = op === '>' || op === '≥'
     const rootIsGreater = slope > 0 ? wantsPositive : !wantsPositive
     const inclusive = op === '≥' || op === '≤'

@@ -1,6 +1,13 @@
-export const APP_VERSION = '0.2.5'
+export const APP_VERSION = '0.2.6'
 
 export const CHANGELOG = [
+  {
+    version: '0.2.6',
+    date: '2026-07-04',
+    items: [
+      'added a general nth-root button — type the index then tap the root sign then the number; handles cube roots and beyond',
+    ],
+  },
   {
     version: '0.2.5',
     date: '2026-07-04',
