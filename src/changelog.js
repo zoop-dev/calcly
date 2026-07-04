@@ -1,6 +1,11 @@
-export const APP_VERSION = '0.2.4'
+export const APP_VERSION = '0.2.5'
 
 export const CHANGELOG = [
+  {
+    version: '0.2.5',
+    date: '2026-07-04',
+    items: ['added a unit converter (length, weight, temperature, volume, speed, data) — tap the swap icon next to formulas'],
+  },
   {
     version: '0.2.4',
     date: '2026-07-04',
