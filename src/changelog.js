@@ -1,6 +1,11 @@
-export const APP_VERSION = '0.2.3'
+export const APP_VERSION = '0.2.4'
 
 export const CHANGELOG = [
+  {
+    version: '0.2.4',
+    date: '2026-07-04',
+    items: ['pin your most-used formulas to the top of the list — tap the star next to any formula'],
+  },
   {
     version: '0.2.3',
     date: '2026-07-03',

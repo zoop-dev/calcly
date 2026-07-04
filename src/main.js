@@ -617,8 +617,23 @@ function loadFormulasData() {
   return (formulasDataModule ??= import('./formulas-data.js'))
 }
 
+const PINNED_FORMULAS_KEY = 'calcly-pinned-formulas'
+
+function loadPinnedFormulas() {
+  try {
+    return new Set(JSON.parse(localStorage.getItem(PINNED_FORMULAS_KEY)) || [])
+  } catch {
+    return new Set()
+  }
+}
+
+function savePinnedFormulas(set) {
+  localStorage.setItem(PINNED_FORMULAS_KEY, JSON.stringify([...set]))
+}
+
 async function showFormulasList() {
   const { FORMULAS, FORMULA_CATEGORIES } = await loadFormulasData()
+  const pinned = loadPinnedFormulas()
   showFilterableList({
     title: 'Formulas',
     items: FORMULAS,
@@ -626,6 +641,12 @@ async function showFormulasList() {
     getCategory: (f) => f.category,
     getKey: (f) => f.name,
     renderItem: (f) => `<span class="formula-item-name">${f.name}</span><span class="formula-item-display">${f.display}</span>`,
+    getPinned: (f) => pinned.has(f.name),
+    onTogglePin: (f) => {
+      if (pinned.has(f.name)) pinned.delete(f.name)
+      else pinned.add(f.name)
+      savePinnedFormulas(pinned)
+    },
     onSelect: (formula) => {
       startFormula(formula)
       render()
