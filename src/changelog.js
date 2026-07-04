@@ -1,6 +1,14 @@
-export const APP_VERSION = '0.2.2'
+export const APP_VERSION = '0.2.3'
 
 export const CHANGELOG = [
+  {
+    version: '0.2.3',
+    date: '2026-07-03',
+    items: [
+      'no visible changes — formulas library now loads on demand instead of on startup, for a slightly faster first load',
+      'you can now skip straight past the install screen with a "continue without installing" link',
+    ],
+  },
   {
     version: '0.2.2',
     date: '2026-07-03',
