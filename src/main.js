@@ -1,5 +1,4 @@
 
-
 import './style.css'
 import '@material/web/icon/icon.js'
 import '@material/web/iconbutton/icon-button.js'
@@ -35,8 +34,6 @@ const SCI_LABELS = {
   normal: { sin: 'sin', cos: 'cos', tan: 'tan', ln: 'ln', log: 'log', sqrt: '√' },
   inv: { sin: 'sin⁻¹', cos: 'cos⁻¹', tan: 'tan⁻¹', ln: 'eˣ', log: '10ˣ', sqrt: 'sqr' },
 }
-
-
 const DISPLAY_FUNC = {
   sin: 'sin',
   cos: 'cos',
@@ -100,7 +97,6 @@ if (
   })
 }
 
-
 let expr = ''
 let expressionLabel = ''
 let justEvaluated = false
@@ -133,9 +129,6 @@ function formatDisplay(raw) {
 let fractionState = null 
 
 function startFraction() {
-  
-  
-  
   commitFormula()
   if (fractionState) return
   if (justEvaluated) {
@@ -146,21 +139,10 @@ function startFraction() {
   retriggerFitCalcGrid()
 }
 
-
-
-
-
 function commitFraction() {
   if (!fractionState) return
   const num = fractionState.num || '0'
   const den = fractionState.den || '1'
-  
-  
-  
-  
-  
-  
-  
   expr += `((${num})÷(${den}))`
   fractionState = null
   retriggerFitCalcGrid()
@@ -169,8 +151,6 @@ function commitFraction() {
 let formulaState = null 
 
 function startFormula(formula) {
-  
-  
   commitFraction()
   if (formulaState) return
   if (justEvaluated) {
@@ -239,11 +219,6 @@ function inputDecimal() {
   if (!trailing.includes('.')) expr += trailing === '' ? '0.' : '.'
 }
 
-
-
-
-
-
 function getTarget() {
   if (fractionState) return fractionState[fractionState.active]
   if (formulaState) return formulaState.values[formulaState.active]
@@ -265,10 +240,6 @@ function appendOperator(op) {
   const last = target.slice(-1)
   const lastIsOperator = '+−×÷^'.includes(last)
 
-  
-  
-  
-  
   if (op === '−' && (lastIsOperator || last === '(')) {
     setTarget(target + '−')
     return
@@ -313,9 +284,6 @@ function appendAbs() {
     expr = ''
     justEvaluated = false
   }
-  
-  
-  
   setTarget(getTarget() + '|')
 }
 
@@ -341,9 +309,6 @@ function clearAll() {
   justEvaluated = false
   fractionState = null
   formulaState = null
-  
-  
-  
   retriggerFitCalcGrid()
 }
 
@@ -381,8 +346,6 @@ function inputEquals() {
   commitFraction()
   commitFormula()
   if (!expr) return
-  
-  
   if (justEvaluated) return
 
   if (/[=<>≤≥]/.test(expr)) {
@@ -450,15 +413,9 @@ function loadFromHistory(entry) {
   render()
 }
 
-
 function escapeHtml(s) {
   return s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 }
-
-
-
-
-
 
 function formulaTemplateHtml(state) {
   return state.template
@@ -563,9 +520,6 @@ function renderHistory() {
     }
   }
 
-  
-  
-  
   retriggerFitCalcGrid()
 }
 
@@ -610,8 +564,6 @@ function showFullHistory() {
   requestAnimationFrame(() => el.classList.add('open'))
 }
 
-
-
 let formulasDataModule = null
 function loadFormulasData() {
   return (formulasDataModule ??= import('./formulas-data.js'))
@@ -652,6 +604,97 @@ async function showFormulasList() {
       render()
     },
   })
+}
+
+let unitsDataModule = null
+function loadUnitsData() {
+  return (unitsDataModule ??= import('./units-data.js'))
+}
+
+async function showUnitConverter() {
+  const { UNIT_CATEGORIES, convertUnit } = await loadUnitsData()
+
+  let category = UNIT_CATEGORIES[0]
+  let fromKey = category.units[0].key
+  let toKey = category.units[1].key
+  let fromValue = '1'
+
+  const el = document.createElement('div')
+  el.className = 'search-overlay zk-filter-overlay'
+  el.setAttribute('data-lenis-prevent', '')
+  document.body.appendChild(el)
+
+  function recompute() {
+    const n = parseFloat(fromValue)
+    const toInput = el.querySelector('#convert-to-value')
+    if (toInput) toInput.value = isFinite(n) ? formatResult(convertUnit(category, n, fromKey, toKey)) : ''
+  }
+
+  function optionsHtml(selectedKey) {
+    return category.units.map((u) => `<option value="${u.key}"${u.key === selectedKey ? ' selected' : ''}>${u.label}</option>`).join('')
+  }
+
+  function render() {
+    el.innerHTML = `
+      <div class="overlay-header">
+        <md-icon-button class="convert-back" aria-label="Back"><md-icon>arrow_back</md-icon></md-icon-button>
+        <p class="overlay-title">Convert</p>
+        <div class="overlay-spacer"></div>
+      </div>
+      <div class="zk-filter-row">
+        ${UNIT_CATEGORIES.map((c) => `<button type="button" class="zk-filter-chip${c.key === category.key ? ' active' : ''}" data-cat="${c.key}">${c.name}</button>`).join('')}
+      </div>
+      <div class="convert-row">
+        <input id="convert-from-value" type="text" inputmode="decimal" value="${fromValue}" />
+        <select id="convert-from-unit">${optionsHtml(fromKey)}</select>
+      </div>
+      <button type="button" class="convert-swap-btn" aria-label="Swap"><md-icon>swap_vert</md-icon></button>
+      <div class="convert-row">
+        <input id="convert-to-value" type="text" readonly />
+        <select id="convert-to-unit">${optionsHtml(toKey)}</select>
+      </div>
+    `
+
+    el.querySelector('.convert-back').addEventListener('click', popOverlay)
+
+    el.querySelectorAll('.zk-filter-chip').forEach((btn) => {
+      btn.addEventListener('click', () => {
+        category = UNIT_CATEGORIES.find((c) => c.key === btn.dataset.cat)
+        fromKey = category.units[0].key
+        toKey = category.units[1].key
+        render()
+      })
+    })
+
+    el.querySelector('#convert-from-value').addEventListener('input', (e) => {
+      fromValue = e.target.value
+      recompute()
+    })
+    el.querySelector('#convert-from-unit').addEventListener('change', (e) => {
+      fromKey = e.target.value
+      recompute()
+    })
+    el.querySelector('#convert-to-unit').addEventListener('change', (e) => {
+      toKey = e.target.value
+      recompute()
+    })
+    el.querySelector('.convert-swap-btn').addEventListener('click', () => {
+      ;[fromKey, toKey] = [toKey, fromKey]
+      render()
+    })
+
+    recompute()
+  }
+
+  render()
+
+  function close() {
+    el.classList.remove('open')
+    setTimeout(() => el.remove(), 300)
+  }
+
+  pushOverlay(close)
+  requestAnimationFrame(() => el.classList.add('open'))
 }
 
 function showHistoryStripCountPicker() {
@@ -701,10 +744,6 @@ function vibrate() {
   navigator.vibrate?.(8)
 }
 
-
-
-
-
 const CALC_BTN_MAX = 100
 const CALC_BTN_MIN = 44
 const CALC_GRID_ROWS = 5
@@ -724,6 +763,9 @@ function renderApp() {
       <div class="topbar-actions">
         <button type="button" class="topbar-icon-btn" id="formulas-btn" aria-label="Formulas">
           <md-icon>calculate</md-icon>
+        </button>
+        <button type="button" class="topbar-icon-btn" id="convert-btn" aria-label="Convert">
+          <md-icon>swap_horiz</md-icon>
         </button>
         <button type="button" class="topbar-icon-btn" id="history-btn" aria-label="History">
           <md-icon>history</md-icon>
@@ -928,6 +970,7 @@ function renderApp() {
   })
 
   document.querySelector('#formulas-btn').addEventListener('click', showFormulasList)
+  document.querySelector('#convert-btn').addEventListener('click', showUnitConverter)
   document.querySelector('#history-btn').addEventListener('click', showFullHistory)
 
   const { dialog: settingsDialog } = initSettingsMenu({
