@@ -1,6 +1,13 @@
-export const APP_VERSION = '0.2.6'
+export const APP_VERSION = '0.2.7'
 
 export const CHANGELOG = [
+  {
+    version: '0.2.7',
+    date: '2026-07-04',
+    items: [
+      'moved Inv up next to Sci/Algebra — Inv + root now gives the nth-root button its own slot in the grid',
+    ],
+  },
   {
     version: '0.2.6',
     date: '2026-07-04',

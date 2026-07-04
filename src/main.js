@@ -29,10 +29,10 @@ const HISTORY_STRIP_COUNT_KEY = 'calcly:history-strip-count'
 const HISTORY_STRIP_OPTIONS = ['none', '2', '5', '10', 'all']
 const ANGLE_MODE_KEY = 'calcly:angle-mode'
 
-const FUNC_INV_MAP = { sin: 'asin', cos: 'acos', tan: 'atan', ln: 'exp', log: 'tenpow', sqrt: 'square' }
+const FUNC_INV_MAP = { sin: 'asin', cos: 'acos', tan: 'atan', ln: 'exp', log: 'tenpow' }
 const SCI_LABELS = {
   normal: { sin: 'sin', cos: 'cos', tan: 'tan', ln: 'ln', log: 'log', sqrt: '√' },
-  inv: { sin: 'sin⁻¹', cos: 'cos⁻¹', tan: 'tan⁻¹', ln: 'eˣ', log: '10ˣ', sqrt: 'sqr' },
+  inv: { sin: 'sin⁻¹', cos: 'cos⁻¹', tan: 'tan⁻¹', ln: 'eˣ', log: '10ˣ', sqrt: 'ⁿ√' },
 }
 const DISPLAY_FUNC = {
   sin: 'sin',
@@ -793,6 +793,7 @@ function renderApp() {
       </button>
       <button type="button" class="sci-tab-btn active" id="tab-sci" data-tab="sci">Sci</button>
       <button type="button" class="sci-tab-btn" id="tab-algebra" data-tab="algebra">Algebra</button>
+      <button type="button" class="sci-tab-btn" id="inv-btn" data-action="inv-mode">Inv</button>
     </div>
     <div class="sci-row-wrap" id="sci-row-wrap">
       <div class="sci-row" id="sci-row-sci">
@@ -803,7 +804,6 @@ function renderApp() {
         <button type="button" class="sci-btn" data-action="func" data-func="sin">sin</button>
         <button type="button" class="sci-btn" data-action="func" data-func="cos">cos</button>
         <button type="button" class="sci-btn" data-action="func" data-func="tan">tan</button>
-        <button type="button" class="sci-btn" id="inv-btn" data-action="inv-mode">Inv</button>
         <button type="button" class="sci-btn" data-action="const" data-const="e">e</button>
         <button type="button" class="sci-btn" data-action="func" data-func="ln">ln</button>
         <button type="button" class="sci-btn" data-action="func" data-func="log">log</button>
@@ -918,8 +918,14 @@ function renderApp() {
 
   document.querySelectorAll('.sci-tab-btn').forEach((tabBtn) => {
     tabBtn.addEventListener('click', () => {
+      if (tabBtn.dataset.action === 'inv-mode') {
+        invMode = !invMode
+        render()
+        return
+      }
+
       const tab = tabBtn.dataset.tab
-      document.querySelectorAll('.sci-tab-btn').forEach((b) => b.classList.toggle('active', b === tabBtn))
+      document.querySelectorAll('.sci-tab-btn[data-tab]').forEach((b) => b.classList.toggle('active', b === tabBtn))
       document.querySelector('#sci-row-sci').hidden = tab !== 'sci'
       document.querySelector('#sci-row-algebra').hidden = tab !== 'algebra'
       retriggerFitCalcGrid()
@@ -934,7 +940,8 @@ function renderApp() {
     const { action, func, const: constSym, postfix, op } = btn.dataset
     hasError = false
     isSolveResult = false
-    if (action === 'func') appendFunc(func)
+    if (action === 'func' && func === 'sqrt' && invMode) appendOperator('⎷')
+    else if (action === 'func') appendFunc(func)
     else if (action === 'const') appendConstant(constSym)
     else if (action === 'postfix') appendPostfix(postfix)
     else if (action === 'paren') appendParen()
@@ -942,7 +949,6 @@ function renderApp() {
     else if (action === 'ee') appendEE()
     else if (action === 'op') appendOperator(op)
     else if (action === 'angle-mode') setAngleMode(angleMode === 'deg' ? 'rad' : 'deg')
-    else if (action === 'inv-mode') invMode = !invMode
     else if (action === 'fraction') startFraction()
     render()
   })

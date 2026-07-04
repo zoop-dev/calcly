@@ -148,6 +148,10 @@
   grid-column: 3;
 }
 
+.sci-tab-btn:nth-of-type(4) {
+  grid-column: 4;
+}
+
 .sci-toggle-row.open .sci-tab-btn {
   display: flex;
 }
